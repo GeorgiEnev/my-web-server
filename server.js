@@ -44,6 +44,17 @@ const server = net.createServer((socket) => {
     console.log("Path:", path);
     console.log("Version:", version);
 
+
+    const respBody = "I Am Batman";
+
+    const resp =
+      "HTTP/1.1 200 OK\r\n" +
+      "Content-Type = text/plain\r\n" +
+      `Content-Length ${Buffer.byteLength(respBody)}\r\n` +
+      "\r\n" +
+      respBody;
+    
+    socket.write(resp);
     socket.end();
   });
 
