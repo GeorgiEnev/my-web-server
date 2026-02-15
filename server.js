@@ -1,22 +1,57 @@
 const net = require("net");
-const { buffer } = require("stream/consumers");
 const port = 6969;
 
 const server = net.createServer((socket) => {
-    console.log("Client connected");   
+  console.log("Client connected");
 
-    let buffer = "";
+  let buffer = "";
 
-    socket.on("data", (chunk) => {
-        buffer += chunk.toString();
+  socket.on("data", (chunk) => {
+    buffer += chunk.toString();
 
-        if (buffer.includes("\r\n\r\n")) {
-            console.log("Full request received");
-            console.log(buffer);
+    const headerEndIndex = buffer.indexOf("\r\n\r\n");
 
-            socket.end();
-        }
-    });
+    if (headerEndIndex === -1) {
+      return;
+    }
+
+    const headersPart = buffer.slice(0, headerEndIndex);
+    const bodyPart = buffer.slice(headerEndIndex + 4);
+
+    const lines = headersPart.split("\r\n");
+    const requestLine = lines[0];
+
+    const parts = requestLine.split(" ");
+    if (parts.length !== 3) {
+      console.log("Malformed request line");
+      socket.end();
+      return;
+    }
+
+    const [method, path, version] = parts;
+
+    const contentLengthMatch = headersPart.match(/Content-Length: (\d+)/i);
+
+    if (contentLengthMatch) {
+      const contentLength = parseInt(contentLengthMatch[1], 10);
+
+      if (bodyPart.length < contentLength) {
+        return; 
+      }
+    }
+
+    console.log("Method:", method);
+    console.log("Path:", path);
+    console.log("Version:", version);
+
+    socket.end();
+  });
+
+  socket.on("error", (err) => {
+    console.error("Socket error:", err.message);
+  });
 });
 
-server.listen(port);
+server.listen(port, () => {
+  console.log(`Server listening on port ${port}`);
+});
