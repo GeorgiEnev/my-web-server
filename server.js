@@ -11,7 +11,6 @@ function sendResponse(socket, statusCode, statusMessage, body) {
   const response = statusLine + headers + "\r\n" + body;
 
   socket.write(response);
-  socket.end();
 }
 
 function handleRequest(method, path, headers, body, socket) {
@@ -34,60 +33,68 @@ const server = net.createServer((socket) => {
   socket.on("data", (chunk) => {
     buffer += chunk.toString();
 
-    const headerEndIndex = buffer.indexOf("\r\n\r\n");
+    while (true) {
+      const headerEndIndex = buffer.indexOf("\r\n\r\n");
 
-    // Headers not complete yet
-    if (headerEndIndex === -1) {
-      return;
-    }
+      if (headerEndIndex === -1) {
+        break;
+      }
 
-    const headersPart = buffer.slice(0, headerEndIndex);
-    const bodyPart = buffer.slice(headerEndIndex + 4);
+      const headersPart = buffer.slice(0, headerEndIndex);
+      const bodyStartIndex = headerEndIndex + 4;
 
-    const lines = headersPart.split("\r\n");
-    const requestLine = lines[0];
+      const lines = headersPart.split("\r\n");
+      const requestLine = lines[0];
+      const parts = requestLine.split(" ");
 
-    const parts = requestLine.split(" ");
+      if (parts.length !== 3) {
+        console.log("Malformed request line");
+        socket.end();
+        return;
+      }
 
-    if (parts.length !== 3) {
-      console.log("Malformed request line");
-      socket.end();
-      return;
-    }
+      const [method, path, version] = parts;
 
-    const [method, path, version] = parts;
+      const headers = {};
 
-    // Parse headers into object
-    const headers = {};
+      for (let i = 1; i < lines.length; i++) {
+        const line = lines[i];
+        const separatorIndex = line.indexOf(":");
+        if (separatorIndex === -1) continue;
 
-    for (let i = 1; i < lines.length; i++) {
-      const line = lines[i];
+        const key = line.slice(0, separatorIndex).trim().toLowerCase();
+        const value = line.slice(separatorIndex + 1).trim();
 
-      const separatorIndex = line.indexOf(":");
+        headers[key] = value;
+      }
 
-      if (separatorIndex === -1) continue;
+      let contentLength = 0;
 
-      const key = line.slice(0, separatorIndex).trim().toLowerCase();
-      const value = line.slice(separatorIndex + 1).trim();
+      if (headers["content-length"]) {
+        contentLength = parseInt(headers["content-length"], 10);
+      }
 
-      headers[key] = value;
-    }
+      const totalRequestLength = bodyStartIndex + contentLength;
 
-    console.log("Method:", method);
-    console.log("Path:", path);
-    console.log("Version:", version);
-    console.log("Headers:", headers);
+      if (buffer.length < totalRequestLength) {
+        break; 
+      }
 
-    // Check for body if Content-Length exists
-    if (headers["content-length"]) {
-      const contentLength = parseInt(headers["content-length"], 10);
+      const body = buffer.slice(bodyStartIndex, totalRequestLength);
 
-      if (bodyPart.length < contentLength) {
-        return; 
+      console.log("Method:", method);
+      console.log("Path:", path);
+      console.log("Headers:", headers);
+
+      handleRequest(method, path, headers, body, socket);
+
+      buffer = buffer.slice(totalRequestLength);
+
+      if (headers["connection"] === "close") {
+        socket.end();
+        return;
       }
     }
-
-    handleRequest(method, path, headers, bodyPart, socket);
   });
 
   socket.on("error", (err) => {
