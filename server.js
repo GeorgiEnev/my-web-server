@@ -30,6 +30,22 @@ const server = net.createServer((socket) => {
 
     const [method, path, version] = parts;
 
+    const headers = [];
+
+    for (let i = 1; i < lines.length; i++){
+      const line = lines[i];
+
+      const separatorIndex = line.indexOf(":");
+
+      if (separatorIndex === -1) continue;
+
+      const key = line.slice(0, separatorIndex).trim().toLowerCase();
+      const value = line.slice(separatorIndex + 1).trim();
+
+      headers[key] = value;
+    }
+    console.log("Headers:", headers);
+
     const contentLengthMatch = headersPart.match(/Content-Length: (\d+)/i);
 
     if (contentLengthMatch) {
