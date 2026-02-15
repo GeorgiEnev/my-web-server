@@ -20,7 +20,7 @@ function handleRequest(method, path, headers, body, socket) {
   }
 
   if (method === "GET" && path === "/about") {
-    return sendResponse(socket, 200, "OK", "About Page");
+    return sendResponse(socket, 200, "OK", "I Am Batman");
   }
 
   return sendResponse(socket, 404, "Not Found", "404 Not Found");
