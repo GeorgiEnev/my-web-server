@@ -61,16 +61,30 @@ const server = net.createServer((socket) => {
     console.log("Version:", version);
 
 
-    const respBody = "I Am Batman";
+    let responseBody;
+    let statusLine;
 
-    const resp =
-      "HTTP/1.1 200 OK\r\n" +
-      "Content-Type = text/plain\r\n" +
-      `Content-Length ${Buffer.byteLength(respBody)}\r\n` +
+    if (method === "GET" && path === "/") {
+      responseBody = "Welcom to the Home Page";
+      statusLine = "HTTP/1.1/ 200 OK\r\n";
+    }
+    else if (method === "GET" && path === "/about") {
+      responseBody = "I Am Batman";
+      statusLine = "HTTP/1.1/ 200 OK\r\n";
+    }
+    else {
+      responseBody = "404 Not Found";
+      statusLine = "HTTP/1.1 404 Not Found\r\n";
+    }
+
+    const response =
+      statusLine +
+      "Content-Type: text/plain\r\n" +
+      `Content-Length: ${Buffer.byteLength(responseBody)}\r\n` +
       "\r\n" +
-      respBody;
-    
-    socket.write(resp);
+      responseBody;
+
+    socket.write(response);
     socket.end();
   });
 
