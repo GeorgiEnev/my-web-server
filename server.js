@@ -1,6 +1,31 @@
 const net = require("net");
 const port = 6969;
 
+function sendResponse(socket, statusCode, statusMessage, body) {
+  const statusLine = `HTTP/1.1 ${statusCode} ${statusMessage}\r\n`;
+
+  const headers =
+    "Content-Type: text/plain\r\n" +
+    `Content-Length: ${Buffer.byteLength(body)}\r\n`;
+
+  const response = statusLine + headers + "\r\n" + body;
+
+  socket.write(response);
+  socket.end();
+}
+
+function handleRequest(method, path, headers, body, socket) {
+  if (method === "GET" && path === "/") {
+    return sendResponse(socket, 200, "OK", "Welcome to the Home Page");
+  }
+
+  if (method === "GET" && path === "/about") {
+    return sendResponse(socket, 200, "OK", "About Page");
+  }
+
+  return sendResponse(socket, 404, "Not Found", "404 Not Found");
+}
+
 const server = net.createServer((socket) => {
   console.log("Client connected");
 
@@ -11,6 +36,7 @@ const server = net.createServer((socket) => {
 
     const headerEndIndex = buffer.indexOf("\r\n\r\n");
 
+    // Headers not complete yet
     if (headerEndIndex === -1) {
       return;
     }
@@ -22,6 +48,7 @@ const server = net.createServer((socket) => {
     const requestLine = lines[0];
 
     const parts = requestLine.split(" ");
+
     if (parts.length !== 3) {
       console.log("Malformed request line");
       socket.end();
@@ -30,9 +57,10 @@ const server = net.createServer((socket) => {
 
     const [method, path, version] = parts;
 
-    const headers = [];
+    // Parse headers into object
+    const headers = {};
 
-    for (let i = 1; i < lines.length; i++){
+    for (let i = 1; i < lines.length; i++) {
       const line = lines[i];
 
       const separatorIndex = line.indexOf(":");
@@ -44,48 +72,22 @@ const server = net.createServer((socket) => {
 
       headers[key] = value;
     }
+
+    console.log("Method:", method);
+    console.log("Path:", path);
+    console.log("Version:", version);
     console.log("Headers:", headers);
 
-    const contentLengthMatch = headersPart.match(/Content-Length: (\d+)/i);
-
-    if (contentLengthMatch) {
-      const contentLength = parseInt(contentLengthMatch[1], 10);
+    // Check for body if Content-Length exists
+    if (headers["content-length"]) {
+      const contentLength = parseInt(headers["content-length"], 10);
 
       if (bodyPart.length < contentLength) {
         return; 
       }
     }
 
-    console.log("Method:", method);
-    console.log("Path:", path);
-    console.log("Version:", version);
-
-
-    let responseBody;
-    let statusLine;
-
-    if (method === "GET" && path === "/") {
-      responseBody = "Welcom to the Home Page";
-      statusLine = "HTTP/1.1/ 200 OK\r\n";
-    }
-    else if (method === "GET" && path === "/about") {
-      responseBody = "I Am Batman";
-      statusLine = "HTTP/1.1/ 200 OK\r\n";
-    }
-    else {
-      responseBody = "404 Not Found";
-      statusLine = "HTTP/1.1 404 Not Found\r\n";
-    }
-
-    const response =
-      statusLine +
-      "Content-Type: text/plain\r\n" +
-      `Content-Length: ${Buffer.byteLength(responseBody)}\r\n` +
-      "\r\n" +
-      responseBody;
-
-    socket.write(response);
-    socket.end();
+    handleRequest(method, path, headers, bodyPart, socket);
   });
 
   socket.on("error", (err) => {
