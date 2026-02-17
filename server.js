@@ -2,7 +2,8 @@ import net from "net";
 import parseRequest from "./httpParser.js";
 import Request from "./request.js";
 import Response from "./response.js";
-import handleRequest from "./router.js";
+import handleRequest from "./app.js";
+import router from "./app.js";
 
 const port = 6969;
 
@@ -30,7 +31,7 @@ const server = net.createServer((socket) => {
 
       const res = new Response(socket);
 
-      handleRequest(req, res);
+      router.handle(req, res);
 
       buffer = buffer.slice(totalLength);
 
