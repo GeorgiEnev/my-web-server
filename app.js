@@ -14,4 +14,9 @@ router.get("/search", (req, res) => {
   res.send(JSON.stringify(req.query));
 });
 
+router.post("/api/echo", (req, res) => {
+  res.setHeader("Content-Type", "application/json");
+  res.send(JSON.stringify({ received: req.json }));
+});
+
 export default router;
