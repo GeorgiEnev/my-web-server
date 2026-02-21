@@ -5,7 +5,7 @@ export default class Request {
     this.headers = headers;
     this.contentType = headers["content-type"] || "";
     this.body = body;
-    this.json = null;
+    this.invalidJson = false;
 
     const { path, query } = this.#parseUrl(rawPath);
 
@@ -16,7 +16,7 @@ export default class Request {
       try {
         this.json = JSON.parse(this.body);
       } catch {
-        this.json = null;
+        this.invalidJson = true;
       }
     }
   }

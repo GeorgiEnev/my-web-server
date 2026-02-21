@@ -15,6 +15,12 @@ router.get("/search", (req, res) => {
 });
 
 router.post("/api/echo", (req, res) => {
+  if (req.invalidJson) {
+    return res.status(400, "Bad Request").json({
+      error: "Invalid JSON body",
+    });
+  }
+
   res.json({ received: req.json });
 });
 
