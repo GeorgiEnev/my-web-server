@@ -2,7 +2,6 @@ import net from "net";
 import parseRequest from "./httpParser.js";
 import Request from "./request.js";
 import Response from "./response.js";
-import handleRequest from "./app.js";
 import router from "./app.js";
 
 const port = 6969;

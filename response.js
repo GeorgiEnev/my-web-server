@@ -1,4 +1,4 @@
- export default class Response {
+export default class Response {
   constructor(socket) {
     this.socket = socket;
     this.statusCode = 200;
@@ -36,4 +36,3 @@
     this.socket.write(response);
   }
 }
-
