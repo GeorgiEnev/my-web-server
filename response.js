@@ -18,6 +18,14 @@ export default class Response {
     this.headers[key] = value;
   }
 
+  json(data) {
+    const jsonString = JSON.stringify(data);
+
+    this.setHeader("Content-Type", "application/json");
+
+    this.send(jsonString);
+  }
+
   send(body) {
     const statusLine = `HTTP/1.1 ${this.statusCode} ${this.statusMessage}\r\n`;
 
