@@ -26,4 +26,8 @@ router.post("/api/echo", (req, res) => {
   res.json({ received: req.json });
 });
 
+router.get("/crash", () => {
+  throw new Error("Test crash");
+});
+
 export default router;

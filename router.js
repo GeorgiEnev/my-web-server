@@ -20,19 +20,26 @@ export default class Router {
     let index = 0;
 
     const next = () => {
-      if (index < this.middlewares.length) {
-        const middleware = this.middlewares[index++];
-        return middleware(req, res, next);
+      try {
+        if (index < this.middlewares.length) {
+          const middleware = this.middlewares[index++];
+          return middleware(req, res, next);
+        }
+
+        const methodRoutes = this.routes.get(req.method);
+        const handler = methodRoutes?.get(req.path);
+
+        if (!handler) {
+          return res.status(404, "Not Found").send("404 Not Found");
+        }
+
+        handler(req, res);
+      } catch (err) {
+        console.error("Unhandled error:", err);
+        res.status(500, "Internal Server Error").json({
+          error: "Internal Server Error",
+        });
       }
-
-      const methodRoutes = this.routes.get(req.method);
-      const handler = methodRoutes?.get(req.path);
-
-      if (!handler) {
-        return res.status(404, "Not Found").send("404 Not Found");
-      }
-
-      handler(req, res);
     };
 
     next();
