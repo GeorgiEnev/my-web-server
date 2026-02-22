@@ -6,6 +6,7 @@ export default class Response {
     this.headers = {
       "Content-Type": "text/plain",
     };
+    this.finished = false;
   }
 
   status(code, message = "OK") {
@@ -27,6 +28,10 @@ export default class Response {
   }
 
   send(body) {
+    if (this.finished) {
+      return;
+    }
+
     const statusLine = `HTTP/1.1 ${this.statusCode} ${this.statusMessage}\r\n`;
 
     const headersString = Object.entries(this.headers)
@@ -42,5 +47,7 @@ export default class Response {
       body;
 
     this.socket.write(response);
+    this.finished = true;
+    this.socket.end();
   }
 }

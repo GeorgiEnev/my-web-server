@@ -33,7 +33,9 @@ export default class Router {
           return res.status(404, "Not Found").send("404 Not Found");
         }
 
-        handler(req, res);
+        if (!res.finished) {
+          handler(req, res);
+        }
       } catch (err) {
         console.error("Unhandled error:", err);
         res.status(500, "Internal Server Error").json({

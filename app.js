@@ -30,4 +30,17 @@ router.get("/crash", () => {
   throw new Error("Test crash");
 });
 
+function earlyResponse(req, res, next) {
+  if (req.path === "/early") {
+    return res.send("Early response");
+  }
+  next();
+}
+
+router.use(earlyResponse);
+
+router.get("/early", (req, res) => {
+  res.send("This should not appear");
+});
+
 export default router;
