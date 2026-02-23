@@ -1,16 +1,7 @@
-import Router from "./router.js";
+import Router from "../routing/router.js";
+import validateJson from "../middleware/validateJson.js";
 
 const router = new Router();
-
-function validateJson(req, res, next) {
-  if (req.invalidJson) {
-    return res.status(400, "Bad Request").json({
-      error: "Invalid JSON body",
-    });
-  }
-
-  next();
-}
 
 router.use(validateJson);
 

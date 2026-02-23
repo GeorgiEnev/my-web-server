@@ -1,8 +1,8 @@
 import net from "net";
-import parseRequest from "./httpParser.js";
-import Request from "./request.js";
-import Response from "./response.js";
-import router from "./app.js";
+import parseRequest from "./core/httpParser.js";
+import Request from "./core/request.js";
+import Response from "./core/response.js";
+import router from "./app/app.js";
 
 const port = 6969;
 
