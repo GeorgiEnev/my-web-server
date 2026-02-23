@@ -11,6 +11,7 @@ export default class Request {
 
     this.path = path;
     this.query = query;
+    this.params = {};
 
     if (this.body && this.contentType.includes("application/json")) {
       try {

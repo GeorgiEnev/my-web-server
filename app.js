@@ -43,4 +43,8 @@ router.get("/early", (req, res) => {
   res.send("This should not appear");
 });
 
+router.get("/users/:id", (req, res) => {
+  res.json({ userId: req.params.id });
+});
+
 export default router;
