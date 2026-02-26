@@ -18,7 +18,7 @@ export default function staticFiles(rootDir) {
     const safePath = path.normalize(requestPath);
     const filePath = path.join(absoluteRoot, safePath);
 
-    if (!filePath.startsWith(absoluteRoot)) {
+    if (path.relative(absoluteRoot, filePath).startsWith("..")) {
       return res.status(403, "Forbidden").send("Forbidden");
     }
 
