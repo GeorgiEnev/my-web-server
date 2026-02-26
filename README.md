@@ -73,8 +73,6 @@ node server.js
 
 The server will start listening on `http://localhost:6969`
 
-```
-
 ## API Endpoints
 
 ### GET /
