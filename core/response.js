@@ -34,6 +34,8 @@ export default class Response {
 
     const statusLine = `HTTP/1.1 ${this.statusCode} ${this.statusMessage}\r\n`;
 
+    this.headers["Content-Length"] = Buffer.byteLength(body);
+    
     const headersString = Object.entries(this.headers)
       .map(([key, value]) => `${key}: ${value}`)
       .join("\r\n");
@@ -41,9 +43,7 @@ export default class Response {
     const response =
       statusLine +
       headersString +
-      "\r\n" +
-      `Content-Length: ${Buffer.byteLength(body)}\r\n` +
-      "\r\n" +
+      "\r\n\r\n" +
       body;
 
     this.socket.write(response);
