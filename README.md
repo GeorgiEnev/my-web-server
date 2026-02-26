@@ -260,14 +260,6 @@ All errors are logged to the console and appropriate HTTP responses are returned
 
 ES Modules (ESM) - All files use `import`/`export` syntax
 
-### Author
-
-GE
-
-### License
-
-MIT
-
 ## Testing
 
 You can test the server using `curl`:
@@ -291,27 +283,6 @@ curl http://localhost:6969/users/123
 curl http://localhost:6969/style.css
 ```
 
-## Future Enhancements
 
-Possible improvements for future versions:
 
-- Support for PUT, DELETE, PATCH methods
-- Cookie handling
-- HTTPS/TLS support
-- Request logging middleware
-- CORS middleware
-- Rate limiting
-- Compression support
-- Database integration examples
 
-## Contributing
-
-Contributions are welcome! Feel free to submit pull requests or open issues for bugs and feature requests.
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
----
-
-**Note:** This is an educational project demonstrating core web server concepts. For production use, consider using established frameworks like Express.js or Fastify.
