@@ -1,8 +1,10 @@
 import Router from "../routing/router.js";
 import validateJson from "../middleware/validateJson.js";
+import staticFiles from "../middleware/staticFiles.js";
 
 const router = new Router();
 
+router.use(staticFiles("public"));
 router.use(validateJson);
 
 router.get("/", (req, res) => {
