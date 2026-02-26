@@ -4,7 +4,7 @@ export default class Request {
     this.rawPath = rawPath;
     this.headers = headers;
     this.contentType = headers["content-type"] || "";
-    this.body = body;
+    this.body = body || "";
     this.invalidJson = false;
 
     const { path, query } = this.#parseUrl(rawPath);
